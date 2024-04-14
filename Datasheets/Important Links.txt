@@ -1,0 +1,8 @@
+HX711 Weight Sensor code and documentation:
+https://github.com/bogde/HX711
+
+HX711 Weight Sensor connection:
+https://www.youtube.com/watch?v=sxzoAGf1kOo
+
+Proximity Sensor documentation:
+https://robu.in/product/cjmcu-9930-proximity-non-contact-gesture-detection-attitude-sensor-arduino/?gad_source=1
