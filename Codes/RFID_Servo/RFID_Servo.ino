@@ -14,10 +14,6 @@
 // Configure the pins for RFID Sensor
 #define SS_PIN 10
 #define RST_PIN 9
-// Configure the pins for Servo Motor
-#define SERVO_PIN 5
-#define GATE_CLOSE 0
-#define GATE_OPEN 90
 
 // Create an instance of the servo motor
 Servo myservo;
@@ -25,6 +21,7 @@ Servo myservo;
 // Create an instance of the proximity sensor
 APDS9930 apds = APDS9930();
 float ambient_light = 0;
+float check_light = 0;
 uint16_t ch0 = 0;
 uint16_t ch1 = 1;
 
@@ -45,7 +42,7 @@ void setup(){
 
     // Initialise the Servo Motor
     Serial.println("Initialising Servo Motor...");
-    myservo.attach(SERVO_PIN);
+    myservo.attach(3);
     Serial.println("Servo Motor Initialised successfully");
 
     // Initialise the Proximity Sensor
@@ -79,17 +76,18 @@ void setup(){
         Serial.print(": 0x");
         Serial.println(val, HEX);
     #endif
+    apds.readAmbientLightLux(check_light);
 
     // Wait for all components to initialise and calibrate
     delay(1000);
     Serial.println("All components initialised successfully");
+    Serial.println("Waiting for the vehicle...");
 }
 
 // Function will be running continuously
 void loop(){
     // Close the gate
-    myservo.write(GATE_CLOSE);
-    Serial.println("Waiting for the vehicle...")
+    myservo.write(180);
 
     // Detect if any vehicle is near the gate
     if (!apds.readAmbientLightLux(ambient_light) ||
@@ -97,7 +95,7 @@ void loop(){
         !apds.readCh1Light(ch1) ) {
         Serial.println(F("Error reading light values"));
     }
-    else if (ambient_light < 50){
+    else if (check_light-ambient_light>check_light*0.70){
         // If Vehicle is detected check for RFID tag
         if (!mfrc522.PICC_IsNewCardPresent()){
             return;
@@ -125,8 +123,9 @@ void loop(){
 
         if (content.substring(1) == "53 5E 2D 0E"){
             // If the RFID tag is authorized, open the gate
-            myservo.write(GATE_OPEN);
+            myservo.write(90);
             Serial.println("Authorized access");
+            Serial.println("Waiting for the vehicle...");
             Serial.println();
 
             // Wait for vehicle to pass through the gate
@@ -135,6 +134,7 @@ void loop(){
         else{
             // If the RFID tag is not authorized, keep the gate closed
             Serial.println("Access denied");
+            Serial.println("Waiting for the vehicle...");
         }
     }
     else{
