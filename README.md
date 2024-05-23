@@ -25,4 +25,4 @@ This project is a prototype of modern day tollgate and demonstrates the working 
 - Now download the code from [Codes folder](https://github.com/sohanshanbhag1502/arduino-toll-gate/tree/main/Codes/RFID_Servo).
 - Open the code in Arduino IDE and upload it.
 
-Note: To learn more about any component go to [Datasheets folder](https://github.com/sohanshanbhag1502/arduino-toll-gate/tree/main/Datasheets) and check the components datasheet.
+Note: To learn more about any component go to [Datasheets folder](https://github.com/sohanshanbhag1502/arduino-toll-gate/tree/main/Datasheets) and refer the components datasheet.
