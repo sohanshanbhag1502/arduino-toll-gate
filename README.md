@@ -1,6 +1,6 @@
 # RFID Toll gate using Arduino
 
-This project is a prototype of modern day tollgate and demonstrates the working of modern day fastag toll gates using RFID signals. 
+This project is a prototype of modern day tollgate and demonstrates the working of modern day fastag toll gates using RFID signals. <br>
 This project mainly uses 3 sensors RFID, Weight and Ultrasonic. RFID sensor is used to detect RFID tag and authorize the vehicle. Weight sensor is used to detect the class of vehicle by checking the range in which weight falls into. Ultrasonic sensor is used to detect presence of a vehicle and activate the RFID sensor.
 
 ## Components Used:
