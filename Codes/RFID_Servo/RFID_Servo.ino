@@ -6,24 +6,33 @@
 #include <Servo.h>
 
 // Modules required for Proximity Sensor
-#include <Wire.h>
-#include <APDS9930.h>
+#include <HCSR04.h>
+
+#include <HX711_ADC.h>
+#if defined(ESP8266)|| defined(ESP32) || defined(AVR)
+#include <EEPROM.h>
+#endif
 
 // Configure the pins for Proximity Sensor
 #define DUMP_REGS
 // Configure the pins for RFID Sensor
 #define SS_PIN 10
 #define RST_PIN 9
+// Configure the pins for Weight Sensor
+const int HX711_dout = 6; //mcu > HX711 dout pin
+const int HX711_sck = 7; //mcu > HX711 sck pin
 
 // Create an instance of the servo motor
 Servo myservo;
 
 // Create an instance of the proximity sensor
-APDS9930 apds = APDS9930();
-float ambient_light = 0;
-float check_light = 0;
-uint16_t ch0 = 0;
-uint16_t ch1 = 1;
+HCSR04 hc(A3, A2);
+
+// Create an instance of the Weight sensor
+HX711_ADC LoadCell(HX711_dout, HX711_sck);
+
+const int calVal_eepromAdress = 0;
+unsigned long t = 0;
 
 // Create an instance of the RFID sensor
 int pos = 0; 
@@ -39,46 +48,30 @@ void setup(){
     SPI.begin();
     mfrc522.PCD_Init();
     Serial.println("RFID Sensor initialised successfully");
+    Serial.println();
 
     // Initialise the Servo Motor
     Serial.println("Initialising Servo Motor...");
-    myservo.attach(3);
+    myservo.attach(5);
     Serial.println("Servo Motor Initialised successfully");
+    Serial.println();
 
-    // Initialise the Proximity Sensor
-    Serial.println("Initialising APDS-9930 Proximity Sensor...");
-    if (apds.init()) {
-        Serial.println(F("APDS-9930 initialised successfully"));
-    } else {
-        Serial.println(F("Something went wrong during APDS-9930 init!"));
+    // Initializing the HX-711 Weight Sensor
+    Serial.println("Initializing HX711 Weight Sensor");
+    LoadCell.begin();
+    float calibrationValue=700;
+    unsigned long stabilizingtime = 2000; 
+    boolean _tare = true;
+    LoadCell.start(stabilizingtime, _tare);
+    if (LoadCell.getTareTimeoutFlag()) {
+      Serial.println("Timeout, check MCU>HX711 wiring and pin designations");
     }
-    if ( apds.enableLightSensor(false) ) {
-        Serial.println(F("Light sensor initialised successfully"));
-    } else {
-        Serial.println(F("Something went wrong during light sensor init!"));
+    else {
+      LoadCell.setCalFactor(calibrationValue);
+      Serial.println("HX711 Weight Sensor is initialized");
+      Serial.println();
     }
-    #ifdef DUMP_REGS
-        uint8_t reg;
-        uint8_t val;
 
-        for(reg = 0x00; reg <= 0x19; reg++) {
-            if( (reg != 0x10) && \
-                (reg != 0x11) )
-            {
-            apds.wireReadDataByte(reg, val);
-            Serial.print(reg, HEX);
-            Serial.print(": 0x");
-            Serial.println(val, HEX);
-            }
-        }
-        apds.wireReadDataByte(0x1E, val);
-        Serial.print(0x1E, HEX);
-        Serial.print(": 0x");
-        Serial.println(val, HEX);
-    #endif
-    apds.readAmbientLightLux(check_light);
-
-    // Wait for all components to initialise and calibrate
     delay(1000);
     Serial.println("All components initialised successfully");
     Serial.println("Waiting for the vehicle...");
@@ -86,16 +79,11 @@ void setup(){
 
 // Function will be running continuously
 void loop(){
-    // Close the gate
-    myservo.write(180);
-
     // Detect if any vehicle is near the gate
-    if (!apds.readAmbientLightLux(ambient_light) ||
-        !apds.readCh0Light(ch0) || 
-        !apds.readCh1Light(ch1) ) {
-        Serial.println(F("Error reading light values"));
-    }
-    else if (check_light-ambient_light>check_light*0.70){
+    int dist=hc.dist();
+    Serial.println(dist);
+    myservo.write(180);
+    if (dist<=2){
         // If Vehicle is detected check for RFID tag
         if (!mfrc522.PICC_IsNewCardPresent()){
             return;
@@ -123,13 +111,27 @@ void loop(){
 
         if (content.substring(1) == "53 5E 2D 0E"){
             // If the RFID tag is authorized, open the gate
-            myservo.write(90);
             Serial.println("Authorized access");
-            Serial.println("Waiting for the vehicle...");
-            Serial.println();
+
+            // Reading weight from Weight Sensor
+            float i = LoadCell.getData();
+            Serial.println(i);
+            myservo.write(90);
+            if (0<=i && i<=5){
+              Serial.println("Detected Vehicle Type:Car");
+            }
+            else if (5<i && i<=10){
+              Serial.println("Detected Vehicle Type:Truck or Bus");
+            }
 
             // Wait for vehicle to pass through the gate
             delay(10000);
+
+            // Close the gate
+            Serial.println();
+    	    myservo.write(180);
+            Serial.println("Waiting for the vehicle...");
+            Serial.println();
         }
         else{
             // If the RFID tag is not authorized, keep the gate closed
