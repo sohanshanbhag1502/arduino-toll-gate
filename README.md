@@ -10,6 +10,7 @@ This project is a prototype of modern day tollgate and demonstrates the working 
 - [HX711 Weight Sensor with 50 Kg Weight Cell](https://robocraze.com/products/50kg-load-cell-hx711)
 - [Tower Pro SG-90 Servo Motor](https://www.amazon.in/Robocraze-Tower-Micro-Servo-Motor/dp/B0825S18VV)
 - [Breadboard](https://robocraze.com/products/half-breadboard)
+- [2 x 1000 ohm resistors](https://robocraze.com/products/1k-resistor-pack-of-10)
 - [Jumper Wires](https://www.amazon.in/Girirajji-Jumper-Female-breadboard-jumper/dp/B09K7LRHW8/ref=sr_1_107?dib=eyJ2IjoiMSJ9.ZyTAcFuWnVCnS1JUy0xkE-dpsZKpGrHgU0VFawsljqDqCgrzRgXOFzpcL40Caf5bavWfC3UO4Zdm8g3WsHj76FAUjb90WqVaOicZ-PEs8BKBgtvmcMgyipPPqouuhLOf2z44sXwyT1RCG5QEVXaHC1t6mREIRHcN8-Z7sGZ6MJsQyLxCdfaUeSgFqzUFaLSboC-LlYNg5A3h3WVN-HNTQJlzDwZ9OGOZhq9v9hk1wI0A-Rz3GPGidK3rhXjr9N7NJYxNyryjx8Muvs2FA4_Yzk35b0ddkmb_zV7ofLyCGkI.wwx729SVV7U0XNH8ZYEjPBqNcc-Ny1KHuam7ijAUB90&dib_tag=se&keywords=Jumper%2BWire&qid=1716481188&sr=8-107&th=1)
 
 ## Circuit diagram:
